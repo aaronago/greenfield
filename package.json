@@ -15,6 +15,7 @@
   "dependencies": {
     "@reach/router": "latest",
     "axios": "latest",
+    "draggable": "^4.2.0",
     "history": "^4.9.0",
     "lodash-es": "^4.17.11",
     "react": "latest",

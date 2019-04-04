@@ -14,12 +14,9 @@ export function ModalProvider({ children }) {
 
   const hideModal = React.useCallback(() => setComponent(null), [])
 
-  const showModal = React.useCallback(
-    f => {
-      setComponent(f({ hideModal }))
-    },
-    [hideModal],
-  )
+  const showModal = f => {
+    setComponent(f({ hideModal }))
+  }
 
   const contextState = {
     showModal,

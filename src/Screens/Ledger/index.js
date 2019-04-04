@@ -10,25 +10,34 @@ const renderData = {
     displayName: 'Name',
     valueGetter: item => item.name,
   },
-  race: { displayName: 'Species', valueGetter: item => item.appearance.race },
-  groupAffiliation: { displayName: 'Group Affiliation(s)', valueGetter: item => item.connections.groupAffiliation },
-  pic: { displayName: 'Image', valueGetter: item => <img src={item.images.lg} alt={item.name} /> },
+  race: {
+    displayName: 'Species',
+    valueGetter: item => item.appearance.race,
+  },
+  groupAffiliation: {
+    displayName: 'Group Affiliation(s)',
+    valueGetter: item => item.connections.groupAffiliation,
+  },
+  pic: {
+    displayName: 'Image',
+    valueGetter: item => <img src={item.images.xs} alt={item.name} />,
+  },
 }
 const userData = {
   name: {
-    width: 40,
+    width: 10,
     enabled: true,
   },
   race: {
-    width: 100,
+    width: 25,
     enabled: true,
   },
   groupAffiliation: {
-    width: 100,
+    width: 65,
     enabled: true,
   },
   pic: {
-    width: 100,
+    width: 10,
     enabled: true,
   },
 }
@@ -41,7 +50,7 @@ export const Ledger = props => {
     const fetchAllHeroes = async () => {
       try {
         const { data } = await getAllHeroes()
-        setHeroes(data.sort(() => Math.random() - 0.5).slice(0, 5))
+        setHeroes(data.sort(() => Math.random() - 0.5))
       } catch (e) {
         console.log(e)
       }
@@ -52,25 +61,9 @@ export const Ledger = props => {
   if (!heroes) {
     return null
   }
-  console.log(tableConfig)
-
   return (
     <Card>
       <Table data={heroes} config={tableConfig} dispatch={dispatch} />
     </Card>
   )
-}
-// eslint-disable-next-line no-lone-blocks
-{
-  /* <Table {...props}>
-    {({data}) => (
-        <Column>
-            <Checkbox/>
-        </Column>
-        <Column>
-            <Checkbox/>
-        </Column>
-        
-    )}
-</Table> */
 }

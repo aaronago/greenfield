@@ -19,7 +19,7 @@ const LedgerTable = ({ data, config, dispatch }) => {
             {config.columnArray
               .filter(col => config.userData[col].enabled)
               .map(col => (
-                <TH key={col} width={`${config.userData[col].width}px`}>
+                <TH key={col} width={`${config.userData[col].width}%`}>
                   {config.renderData[col].displayName}
                 </TH>
               ))}

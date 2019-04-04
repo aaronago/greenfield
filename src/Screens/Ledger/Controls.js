@@ -11,21 +11,37 @@ const Wrapper = styled.div`
   align-self: flex-end;
   background: ${themeValue('colors.gray.400')};
   padding: ${themeValue('space.small')};
+  svg {
+    cursor: pointer;
+  }
+`
+
+const ModalWrapper = styled.div``
+const Row = styled.div`
+  display: flex;
+  * {
+    padding: 0 ${themeValue('space.small')};
+  }
+`
+const P = styled.p`
+  color: ${({ enabledd }) => (enabledd ? '' : themeValue('colors.gray.400'))};
 `
 const EditModal = ({ config, dispatch }) => {
   const handleClick = key => {
     dispatch({ type: 'toggleColumn', payload: key })
   }
   return (
-    <div>
+    <ModalWrapper>
       {config.columnArray.map(col => {
+        const { enabled } = config.userData[col]
         return (
-          <p key={col} onClick={() => handleClick(col)}>
-            {config.renderData[col].displayName}
-          </p>
+          <Row key={col}>
+            <input type="checkbox" checked={enabled} onChange={() => handleClick(col)} />
+            <P enabledd={enabled}>{config.renderData[col].displayName}</P>
+          </Row>
         )
       })}
-    </div>
+    </ModalWrapper>
   )
 }
 const Controls = props => {
