@@ -9,19 +9,29 @@
     "eject": "react-scripts eject",
     "now-start": "serve -s ./build",
     "ci-build": "CI=true npm run build",
-    "ci-test": "CI=true npm test"
+    "ci-test": "CI=true npm test",
+    "lint": "eslint \"src/**/*.{js,jsx}\""
   },
   "dependencies": {
     "@reach/router": "latest",
     "axios": "latest",
+    "history": "^4.9.0",
+    "lodash-es": "^4.17.11",
     "react": "latest",
     "react-dom": "latest",
+    "react-draggable": "^3.2.1",
+    "react-modal": "^3.8.1",
+    "react-router-dom": "^5.0.0",
     "react-scripts": "latest",
+    "react-virtualized": "^9.21.0",
     "serve": "latest",
-    "styled-components": "latest"
+    "styled-components": "latest",
+    "styled-icons": "^7.9.0"
   },
   "devDependencies": {
-    "husky": "latest"
+    "husky": "latest",
+    "eslint-plugin-react-hooks": "^1.5.0",
+    "source-map-explorer": "^1.6.0"
   },
   "browserslist": [
     ">0.2%",
