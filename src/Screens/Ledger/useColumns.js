@@ -3,7 +3,17 @@ import { useReducer } from 'react'
 const reducer = (state, { type, payload }) => {
   switch (type) {
     case 'columnResize':
-      return state
+      const { col, deltaX } = payload
+      return {
+        ...state,
+        userData: {
+          ...state.userData,
+          [col]: {
+            ...state.userData[col],
+            width: state.userData[col].width + deltaX,
+          },
+        },
+      }
     case 'toggleColumn':
       return {
         ...state,
@@ -15,6 +25,7 @@ const reducer = (state, { type, payload }) => {
           },
         },
       }
+
     default:
       return state
   }

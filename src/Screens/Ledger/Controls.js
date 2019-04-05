@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import { Edit } from 'styled-icons/material/Edit'
 import { QuestionCircle } from 'styled-icons/fa-solid/QuestionCircle'
 import { themeValue } from 'theme'
 
-import useModal from 'Hooks/useModal'
+import useModal, { ModalContext } from 'Hooks/useModal'
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,33 +26,34 @@ const Row = styled.div`
 const P = styled.p`
   color: ${({ enabledd }) => (enabledd ? '' : themeValue('colors.gray.400'))};
 `
-const EditModal = ({ config, dispatch }) => {
+const EditModal = ({ dispatch }) => {
+  const { modalState } = useContext(ModalContext)
   const handleClick = key => {
     dispatch({ type: 'toggleColumn', payload: key })
   }
   return (
     <ModalWrapper>
-      {config.columnArray.map(col => {
-        const { enabled } = config.userData[col]
+      {modalState.columnArray.map(col => {
+        const { enabled } = modalState.userData[col]
         return (
           <Row key={col}>
             <input type="checkbox" checked={enabled} onChange={() => handleClick(col)} />
-            <P enabledd={enabled}>{config.renderData[col].displayName}</P>
+            <P enabledd={enabled}>{modalState.renderData[col].displayName}</P>
           </Row>
         )
       })}
     </ModalWrapper>
   )
 }
-const Controls = props => {
-  const [showModal] = useModal()
+const Controls = ({ config, dispatch }) => {
+  const { showModal, setModalState } = useModal()
+  useEffect(() => {
+    setModalState(config)
+  }, [config, setModalState])
 
   return (
     <Wrapper>
-      <Edit
-        size={15}
-        onClick={() => showModal(({ hideModal }) => <EditModal config={props.config} dispatch={props.dispatch} />)}
-      />
+      <Edit size={15} onClick={() => showModal(({ hideModal }) => <EditModal dispatch={dispatch} />)} />
       <QuestionCircle size={15} />
     </Wrapper>
   )
