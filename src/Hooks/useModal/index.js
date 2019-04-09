@@ -5,15 +5,12 @@ import Modal from './Modal'
 const contextState = {
   showModal: () => null,
   hideModal: () => null,
-  setModalState: () => null,
-  modalState: null,
 }
 
-export const ModalContext = React.createContext(contextState)
+const ModalContext = React.createContext(contextState)
 
 export function ModalProvider({ children }) {
   const [Component, setComponent] = React.useState(null)
-  const [modalState, setModalState] = React.useState(null)
 
   const hideModal = React.useCallback(() => setComponent(null), [])
 
@@ -27,8 +24,6 @@ export function ModalProvider({ children }) {
   const contextState = {
     showModal,
     hideModal,
-    setModalState,
-    modalState,
   }
 
   return (
@@ -40,8 +35,8 @@ export function ModalProvider({ children }) {
 }
 
 function useModal() {
-  const { showModal, hideModal, modalState, setModalState } = React.useContext(ModalContext)
-  return { showModal, hideModal, modalState, setModalState }
+  const { showModal, hideModal } = React.useContext(ModalContext)
+  return [showModal, hideModal]
 }
 
 export default useModal

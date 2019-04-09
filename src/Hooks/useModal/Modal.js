@@ -2,8 +2,8 @@ import React from 'react'
 import { createPortal } from 'react-dom'
 import ReactModal from 'react-modal'
 import styled from 'styled-components'
-
 import { Close as StyledIconClose } from 'styled-icons/material/Close'
+
 import { TextButton } from 'Atoms'
 import { themeValue } from 'theme'
 

@@ -3,12 +3,7 @@ import { themeValue } from 'theme'
 
 // GLOBAL WRAPPER
 export const Application = styled('main')`
-  display: flex;
-  width: 100%;
-  max-width: 1200px;
-  margin: ${themeValue('space.base')} auto;
-  align-items: center;
-  justify-content: center;
+  padding: ${themeValue('space.large')};
 `
 
 // PRIMARY CONTENT AREA
