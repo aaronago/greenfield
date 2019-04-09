@@ -1,5 +1,10 @@
 import { useReducer } from 'react'
 
+const calculateColumnWidth = (currentWidth, deltaX) => {
+  const newWidth = currentWidth + deltaX
+  return newWidth > 0 ? newWidth : currentWidth
+}
+
 const tableConfigReducer = (state, { type, payload }) => {
   switch (type) {
     case 'columnResize':
@@ -10,7 +15,7 @@ const tableConfigReducer = (state, { type, payload }) => {
           ...state.userData,
           [col]: {
             ...state.userData[col],
-            width: state.userData[col].width + deltaX,
+            width: calculateColumnWidth(state.userData[col].width, deltaX),
           },
         },
       }

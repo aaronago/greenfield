@@ -1,99 +1,79 @@
-import React, { useEffect, useState, useReducer } from 'react'
+import React from 'react'
+import styled from 'styled-components'
 import orderBy from 'lodash-es/orderBy'
-import { getAllHeroes } from 'api'
-import { Card } from 'Atoms'
-import useColumns from './useColumns'
-import Table from './Table'
+import isEqual from 'lodash-es/isEqual'
+import { Table, THead, TR, TD } from 'Atoms'
 
-const columnArray = ['name', 'race', 'groupAffiliation', 'pic']
-const renderData = {
-  name: {
-    displayName: 'Name',
-    valueGetter: item => item.name,
-    sortPath: 'name',
-  },
-  race: {
-    displayName: 'Species',
-    valueGetter: item => item.appearance.race,
-    sortPath: 'appearance.race',
-  },
-  groupAffiliation: {
-    displayName: 'Group Affiliation(s)',
-    valueGetter: item => item.connections.groupAffiliation,
-    sortPath: 'connections.groupAffiliation',
-  },
-  pic: {
-    displayName: 'Image',
-    valueGetter: item => <img src={item.images.xs} alt={item.name} />,
-    sortPath: 'name',
-  },
-}
-const userData = {
-  name: {
-    width: 300,
-    enabled: true,
-  },
-  race: {
-    width: 300,
-    enabled: true,
-  },
-  groupAffiliation: {
-    width: 300,
-    enabled: true,
-  },
-  pic: {
-    width: 300,
-    enabled: true,
-  },
+import { ControlledHeaderCell } from './Cell'
+import Controls from './Controls'
+
+const Wrapper = styled.div`
+  min-width: 1024px;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+`
+
+const Body = React.memo(({ activeColumns, data, renderData, handleRowClick }) => {
+  // Started experimenting with an add to cart type cell with an onclick, hence all the click handling stuff
+  return (
+    <tbody>
+      {data.map(datum => (
+        <TR key={datum.id} onClick={handleRowClick ? () => handleRowClick(datum) : null}>
+          {activeColumns.map(col => {
+            const handleClick = !renderData[col].onClick
+              ? null
+              : e => {
+                  e.stopPropagation()
+                  renderData[col].onClick(datum)
+                }
+            return (
+              <TD key={col} onClick={handleClick}>
+                {renderData[col].valueGetter(datum)}
+              </TD>
+            )
+          })}
+        </TR>
+      ))}
+    </tbody>
+  )
+}, compare)
+
+function compare(prevProps, nextProps) {
+  return isEqual(prevProps.activeColumns, nextProps.activeColumns) && isEqual(prevProps.data, nextProps.data)
 }
 
-const initialSortState = {
-  key: '',
-  dir: 'asc',
-}
+const LedgerTable = ({ data, config, dispatch, sortBy, sort, ...props }) => {
+  const activeColumns = React.useMemo(() => {
+    return config.columnArray.filter(col => config.userData[col].enabled)
+  }, [config.columnArray, config.userData])
 
-const sortReducer = (state, { key }) => {
-  return {
-    key,
-    dir: state.dir === 'asc' ? 'desc' : 'asc',
-  }
-}
-
-export const Ledger = props => {
-  const [heroes, setHeroes] = useState()
-  const [sort, setSort] = useReducer(sortReducer, initialSortState)
-  const [tableConfig, dispatch] = useColumns({ columnArray, renderData, userData })
-
-  useEffect(() => {
-    const fetchAllHeroes = async () => {
-      try {
-        const { data } = await getAllHeroes()
-        setHeroes(data.sort(() => Math.random() - 0.5).slice(0, 5))
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    fetchAllHeroes()
-  }, [])
-
-  if (!heroes) {
-    return null
-  }
-  console.log(sort)
-
-  const activeColumns = tableConfig.columnArray.filter(col => tableConfig.userData[col].enabled)
-  const sortedData = sort.key && sort.dir ? orderBy(heroes, sort.key, sort.dir) : heroes
+  const sortedData = React.useMemo(() => {
+    return sort.key && sort.dir ? orderBy(data, sort.key, sort.dir) : data
+  }, [data, sort.dir, sort.key])
 
   return (
-    <Card>
-      <Table
-        sort={sort}
-        sortBy={setSort}
-        data={sortedData}
-        config={tableConfig}
-        dispatch={dispatch}
-        activeColumns={activeColumns}
-      />
-    </Card>
+    <Wrapper>
+      <Controls config={config} dispatch={dispatch} />
+      <Table>
+        <THead>
+          <TR>
+            {activeColumns.map(col => (
+              <ControlledHeaderCell
+                col={col}
+                dispatch={dispatch}
+                key={col}
+                renderData={config.renderData[col]}
+                userWidth={config.userData[col].width}
+                sort={sort}
+                sortBy={sortBy}
+              />
+            ))}
+          </TR>
+        </THead>
+        <Body data={sortedData} activeColumns={activeColumns} renderData={config.renderData} {...props} />
+      </Table>
+    </Wrapper>
   )
 }
+export default LedgerTable

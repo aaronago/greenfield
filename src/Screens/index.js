@@ -1,2 +1,2 @@
-export { Home } from "./Home";
-export { Ledger } from "./Ledger";
+export { Home } from './Home'
+export { HeroTables } from './HeroTables'

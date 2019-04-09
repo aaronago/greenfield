@@ -9,9 +9,8 @@ import { themeValue } from 'theme'
 import { TH } from 'Atoms'
 
 export const HeaderCell = styled(TH)`
-  width: ${({ userWidth }) => userWidth};
-  max-width: ${({ userWidth }) => userWidth};
-  padding-right: ${themeValue('space.medium')}
+  width: ${({ userWidth }) => userWidth + 'px'};
+  max-width: ${({ userWidth }) => userWidth + 'px'};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,20 +41,21 @@ export const HeaderCell = styled(TH)`
   }
 `
 export const ControlledHeaderCell = ({ col, renderData, sort, sortBy, dispatch, ...props }) => {
-  const handleDrag = (e, { deltaX }) =>
+  const handleDrag = (e, { deltaX }) => {
     dispatch({
       type: 'columnResize',
       payload: { col, deltaX },
     })
-  const handleClick = () => {
-    sortBy({ key: renderData[col].sortPath })
+  }
+  const handleSortClick = () => {
+    sortBy({ key: renderData.sortPath })
   }
 
-  const SortIcon = sort.key !== renderData[col].sortPath ? Sort : sort.dir === 'asc' ? SortUp : SortDown
+  const SortIcon = sort.key !== renderData.sortPath ? Sort : sort.dir === 'asc' ? SortUp : SortDown
   return (
     <HeaderCell {...props}>
-      <SortIcon size={12} onClick={handleClick} />
-      {props.label}
+      {renderData.sortPath && <SortIcon size={12} onClick={handleSortClick} />}
+      {renderData.displayName}
       <Draggable
         axis="x"
         defaultClassName="DragHandle"
