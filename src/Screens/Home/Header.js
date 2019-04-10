@@ -1,19 +1,23 @@
 import React from 'react'
 import Draggable from 'react-draggable'
-import { DotsVerticalRounded } from 'styled-icons/boxicons-regular/DotsVerticalRounded'
+import {DotsVerticalRounded} from 'styled-icons/boxicons-regular/DotsVerticalRounded'
+import {Sort} from 'styled-icons/fa-solid/Sort'
 import mapValues from 'lodash-es/mapValues'
 
-import {DragSpan, TH} from './Visuals'
+import {DragSpan, SortClickable, TH} from './Visuals'
 
 const THead = React.memo((props) => {
-  const {columnMap, columns, setColumnPreferences, setWidth} = props
+  const {columnMap, columns, handleSort, setColumnPreferences, setWidth} = props
   return (
     <thead>
       <tr>
         {columns.map(key => {
           return (
             <TH key={`${key}-th`}>
-              {columnMap[key].label}
+              <SortClickable onClick={() => handleSort(key)}>
+                <Sort size={14} />
+                {columnMap[key].label}
+              </SortClickable>
               <Draggable
                 axis="x"
                 onDrag={(e, {deltaX}) => setWidth({key, deltaX})}
@@ -38,7 +42,7 @@ function reducer (state, {key, deltaX}) {
 }
 
 function Header (props) {
-  const {columnMap, columns, columnPreferences, setColumnPreferences} = props
+  const {columnMap, columns, columnPreferences, handleSort, setColumnPreferences} = props
   const [widths, setWidth] = React.useReducer(reducer, mapValues(columnPreferences, (o) => o.width))
 
   return (
@@ -50,7 +54,13 @@ function Header (props) {
           )
         })}
       </colgroup>
-      <THead columnMap={columnMap} columns={columns} setColumnPreferences={setColumnPreferences} setWidth={setWidth} />
+      <THead
+        columnMap={columnMap}
+        columns={columns}
+        handleSort={handleSort}
+        setColumnPreferences={setColumnPreferences}
+        setWidth={setWidth}
+      />
     </React.Fragment>
   )
 }
