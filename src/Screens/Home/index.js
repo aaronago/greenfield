@@ -37,21 +37,24 @@ const columnMap = {
 }
 
 const defaultColumnPreferences = {
-  name: {
-    width: 500,
-    enabled: true
-  },
-  gender: {
-    width: 100,
-    enabled: true
-  },
-  race: {
-    width: 200,
-    enabled: true
-  },
-  publisher: {
-    width: 200,
-    enabled: true
+  order: masterColumnArray.map((_, index) => index),
+  columns: {
+    name: {
+      width: 500,
+      enabled: true
+    },
+    gender: {
+      width: 100,
+      enabled: true
+    },
+    race: {
+      width: 200,
+      enabled: true
+    },
+    publisher: {
+      width: 200,
+      enabled: true
+    }
   }
 }
 
@@ -60,9 +63,12 @@ function preferencesReducer (state, action) {
     const {key, lastX} = action.resize
     return {
       ...state,
-      [key]: {
-        ...state[key],
-        width: state[key].width + lastX
+      columns: {
+        ...state.columns,
+        [key]: {
+          ...state.columns[key],
+          width: state.columns[key].width + lastX
+        }
       }
     }
   }
@@ -71,10 +77,20 @@ function preferencesReducer (state, action) {
     const {key, value} = action.showHide
     return {
       ...state,
-      [key]: {
-        ...state[key],
-        enabled: value
+      columns: {
+        ...state.columns,
+        [key]: {
+          ...state.columns[key],
+          enabled: value
+        }
       }
+    }
+  }
+
+  if (action.changeOrder) {
+    return {
+      ...state,
+      order: action.changeOrder
     }
   }
 
@@ -92,7 +108,7 @@ export function Home () {
 
   React.useEffect(() => {
     if (prevColumnPreferences.current && !isEqual(prevColumnPreferences, columnPreferences)) {
-      console.log('Update columnPreferences via API')
+      console.log('Update columnPreferences via API', columnPreferences)
     }
   }, [columnPreferences])
 
@@ -132,7 +148,7 @@ export function Home () {
   // END SORT
 
   const columns = React.useMemo(() => {
-    return Object.keys(columnPreferences).filter(k => columnPreferences[k].enabled)
+    return columnPreferences.order.map(i => masterColumnArray[i]).filter(k => columnPreferences.columns[k].enabled)
   }, [columnPreferences])
 
   const memoModal = React.useCallback(() => {
@@ -140,11 +156,12 @@ export function Home () {
       <Modal
         columnMap={columnMap}
         columns={columns}
+        columnPreferences={columnPreferences}
         masterColumnArray={masterColumnArray}
         setColumnPreferences={setColumnPreferences}
       />
     )
-  }, [columns])
+  }, [columnPreferences, columns])
 
   const [showModal] = useModal(memoModal)
 

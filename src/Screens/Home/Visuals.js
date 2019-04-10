@@ -1,5 +1,6 @@
 
 import styled, {css} from 'styled-components'
+import {animated} from 'react-spring'
 
 export const H2 = styled('h2')`
   width: 1000px;
@@ -52,4 +53,20 @@ export const SortClickable = styled('span')`
   cursor: pointer;
   width: 100%;
   align-items: center;
+`
+
+export const ReorderDraggable = styled(animated.div)`
+  position: absolute;
+  height: 25px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: visible;
+  pointer-events: auto;
+  border-radius: 0.25rem;
+
+  span {
+    cursor: grab;
+  }
 `

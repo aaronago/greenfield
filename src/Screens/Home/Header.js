@@ -43,7 +43,7 @@ function reducer (state, {key, deltaX}) {
 
 function Header (props) {
   const {columnMap, columns, columnPreferences, handleSort, setColumnPreferences} = props
-  const [widths, setWidth] = React.useReducer(reducer, mapValues(columnPreferences, (o) => o.width))
+  const [widths, setWidth] = React.useReducer(reducer, mapValues(columnPreferences.columns, (o) => o.width))
 
   return (
     <React.Fragment>
