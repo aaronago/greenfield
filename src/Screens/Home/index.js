@@ -36,7 +36,7 @@ const columnMap = {
   }
 }
 
-const defaultColumnPreferences = {
+const initialPreferences = {
   order: masterColumnArray.map((_, index) => index),
   columns: {
     name: {
@@ -97,13 +97,61 @@ function preferencesReducer (state, action) {
   return state
 }
 
+const initialData = {
+  sort: {
+    key: 'name',
+    direction: 'asc'
+  },
+  heroes: null
+}
+
+function dataReducer (state, action) {
+  if (action.setHeroes) {
+    const {key, direction} = state.sort
+    return {
+      ...state,
+      heroes: orderBy(action.setHeroes, columnMap[key].value, direction)
+    }
+  }
+
+  if (action.sortKey) {
+    const {sortKey} = action
+    const {sort} = state
+    if (sortKey === sort.key) {
+      return sort.direction === 'asc'
+        ? {
+            sort: {
+              key: sortKey,
+              direction: 'desc'
+            },
+            heroes: orderBy(state.heroes, columnMap[sortKey].value, 'desc')
+          }
+        : {
+            sort: {
+              key: sortKey,
+              direction: 'asc'
+            },
+            heroes: orderBy(state.heroes, columnMap[sortKey].value, 'asc')
+          }
+    } else {
+      return {
+        sort: {
+          key: sortKey,
+          direction: 'asc'
+        },
+        heroes: orderBy(state.heroes, columnMap[sortKey].value, 'asc')
+      }
+    }
+  }
+
+  return state
+}
+
 export function Home () {
-  // @TODO Let's combine our heroes and sort state into a single reducer as sorting in this instance
-  // is JS based, not API based.
-  const [heroes, setHeroes] = React.useState(null)
-  const [sort, setSort] = React.useState({key: 'name', direction: 'asc'})
-  // @TODO defaultColumnPreferences would actually be merged with the results of the getPreference API call.
-  const [columnPreferences, setColumnPreferences] = React.useReducer(preferencesReducer, defaultColumnPreferences)
+  const [data, dispatch] = React.useReducer(dataReducer, initialData)
+  const {heroes, sort} = data
+
+  const [columnPreferences, setColumnPreferences] = React.useReducer(preferencesReducer, initialPreferences)
   const prevColumnPreferences = React.useRef(null)
 
   React.useEffect(() => {
@@ -112,40 +160,19 @@ export function Home () {
     }
   }, [columnPreferences])
 
-  // BEGIN SORT & DATA FETCH
-  const performSort = React.useCallback((data, key, direction) => {
-    setHeroes(orderBy(data, columnMap[key].value, direction))
-  }, [])
-
   React.useEffect(() => {
     async function fetchData () {
       try {
         const { data } = await getAllHeroes()
-        // Don't assume results are ordered correctly.
-        performSort(data, 'name', 'asc')
+        dispatch({setHeroes: data})
       } catch (e) {
         console.error(e)
       }
     }
     fetchData()
-  }, [performSort])
+  }, [])
 
-  const sortOptions = React.useCallback((key) => {
-    if (key === sort.key) {
-      return sort.direction === 'asc'
-        ? {key: key, direction: 'desc'}
-        : {key: key, direction: 'asc'}
-    } else {
-      return {key: key, direction: 'asc'}
-    }
-  }, [sort])
-
-  const handleSort = React.useCallback(key => {
-    const options = sortOptions(key)
-    performSort(heroes, key, options.direction)
-    setSort(options)
-  }, [heroes, performSort, sortOptions])
-  // END SORT
+  const handleSort = React.useCallback((sortKey) => dispatch({sortKey}), [])
 
   const columns = React.useMemo(() => {
     return columnPreferences.order.map(i => masterColumnArray[i]).filter(k => columnPreferences.columns[k].enabled)
@@ -183,6 +210,7 @@ export function Home () {
           columns={columns}
           handleSort={handleSort}
           setColumnPreferences={setColumnPreferences}
+          sort={sort}
         />
         <tbody>
           {heroes.map((hero, i) => {
@@ -203,3 +231,8 @@ export function Home () {
     </React.Fragment>
   )
 }
+
+/**
+ * WIP: SuperTable API
+ * sort: {key, direction} required, direction must be enum 'asc' || 'desc'
+ */

@@ -1,6 +1,7 @@
 
 import styled, {css} from 'styled-components'
 import {animated} from 'react-spring'
+import {Sort} from 'styled-icons/fa-solid/Sort'
 
 export const H2 = styled('h2')`
   width: 1000px;
@@ -69,4 +70,8 @@ export const ReorderDraggable = styled(animated.div)`
   span {
     cursor: grab;
   }
+`
+
+export const CanSort = styled(Sort)`
+  color: #999;
 `
