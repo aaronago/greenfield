@@ -33,10 +33,11 @@ function Modal (props) {
   return (
     <React.Fragment>
       <h2>Manage Columns</h2>
-      <div style={{ position: 'relative', height: masterColumnArray.length * 35 + 'px' }}>
+      <div style={{ position: 'relative', height: masterColumnArray.length * 25 + 'px' }}>
         {springs.map((props, i) => {
           const {backgroundColor, scale, y, zIndex} = props
           const key = masterColumnArray[i]
+
           return (
             <ReorderDraggable
               key={key}
@@ -46,11 +47,14 @@ function Modal (props) {
                 transform: interpolate([y, scale], (y, s) => `translate3d(0,${y}px,0) scale(${s})`)
               }}
             >
-              <input
-                type='checkbox'
-                onChange={e => setColumnPreferences({showHide: {key, value: e.target.checked}})}
-                checked={columns.includes(key)}
-              />
+              {
+                !columnMap[key].fixed &&
+                  <input
+                    type='checkbox'
+                    onChange={e => setColumnPreferences({showHide: {key, value: e.target.checked}})}
+                    checked={columns.includes(key)}
+                  />
+                }
               {/* Bind the actual click/drag functionality just to the text. */}
               <span {...bind(i)}>{columnMap[key].label}</span>
             </ReorderDraggable>

@@ -13,6 +13,10 @@ const THead = React.memo((props) => {
     <thead>
       <tr>
         {columns.map(key => {
+          if (columnMap[key].fixed) {
+            return <TH key={`${key}-th`}>{columnMap[key].label}</TH>
+          }
+          
           return (
             <TH key={`${key}-th`}>
               <SortClickable onClick={() => handleSort(key)}>

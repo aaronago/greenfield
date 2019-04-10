@@ -2,6 +2,7 @@
 import React from 'react'
 import isEqual from 'lodash-es/isEqual'
 import orderBy from 'lodash-es/orderBy'
+import {MoneyBill} from 'styled-icons/fa-solid/MoneyBill'
 
 import useModal from 'Hooks/useModal'
 import {getAllHeroes} from 'api'
@@ -14,7 +15,8 @@ const masterColumnArray = [
   'name',
   'gender',
   'race',
-  'publisher'
+  'publisher',
+  'pay'
 ]
 
 const columnMap = {
@@ -33,6 +35,11 @@ const columnMap = {
   publisher: {
     label: 'Publisher',
     value: h => h.biography.publisher
+  },
+  pay: {
+    label: 'Pay',
+    value: h => <MoneyBill size={24} />,
+    fixed: true
   }
 }
 
@@ -53,6 +60,10 @@ const initialPreferences = {
     },
     publisher: {
       width: 200,
+      enabled: true
+    },
+    pay: {
+      width: 30,
       enabled: true
     }
   }
@@ -92,6 +103,10 @@ function preferencesReducer (state, action) {
       ...state,
       order: action.changeOrder
     }
+  }
+
+  if (action.hydrate) {
+    return {...state, ...action.hydrate}
   }
 
   return state
@@ -156,7 +171,13 @@ export function Home () {
 
   React.useEffect(() => {
     if (prevColumnPreferences.current && !isEqual(prevColumnPreferences, columnPreferences)) {
-      console.log('Update columnPreferences via API', columnPreferences)
+      localStorage.setItem('super-hero-preferences', JSON.stringify(columnPreferences))
+    }
+
+    if (!prevColumnPreferences.current && localStorage.getItem('super-hero-preferences')) {
+      setColumnPreferences({
+        hydrate: JSON.parse(localStorage.getItem('super-hero-preferences'))
+      })
     }
   }, [columnPreferences])
 
