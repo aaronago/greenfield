@@ -12,7 +12,7 @@ const THead = React.memo((props) => {
       <tr>
         {columns.map(key => {
           return (
-            <TH key={`th-${key}`}>
+            <TH key={`${key}-th`}>
               {columnMap[key].label}
               <Draggable
                 axis="x"

@@ -2,16 +2,17 @@
 import React from 'react'
 import isEqual from 'lodash-es/isEqual'
 
+import useModal from 'Hooks/useModal'
 import {getAllHeroes} from 'api'
 
 import Header from './Header'
-import useModal from 'Hooks/useModal'
+import Modal from './Modal'
 
-// const masterColumnArray = [
-//   'name',
-//   'gender',
-//   'race'
-// ]
+const masterColumnArray = [
+  'name',
+  'gender',
+  'race'
+]
 
 const columnMap = {
   name: {
@@ -55,6 +56,17 @@ function reducer (state, action) {
     }
   }
 
+  if (action.showHide) {
+    const {key, value} = action.showHide
+    return {
+      ...state,
+      [key]: {
+        ...state[key],
+        enabled: value
+      }
+    }
+  }
+
   return state
 }
 
@@ -62,8 +74,6 @@ export function Home () {
   const [heroes, setHeroes] = React.useState(null)
   const [columnPreferences, setColumnPreferences] = React.useReducer(reducer, defaultColumnPreferences)
   const prevColumnPreferences = React.useRef(null)
-
-  const [showModal] = useModal()
 
   React.useEffect(() => {
     if (prevColumnPreferences.current && !isEqual(prevColumnPreferences, columnPreferences)) {
@@ -87,6 +97,19 @@ export function Home () {
     return Object.keys(columnPreferences).filter(k => columnPreferences[k].enabled)
   }, [columnPreferences])
 
+  const memoModal = React.useCallback(() => {
+    return (
+      <Modal
+        columnMap={columnMap}
+        columns={columns}
+        masterColumnArray={masterColumnArray}
+        setColumnPreferences={setColumnPreferences}
+      />
+    )
+  }, [columns])
+
+  const [showModal] = useModal(memoModal)
+
   React.useEffect(() => {
     prevColumnPreferences.current = columnPreferences
   }, [columnPreferences])
@@ -98,7 +121,11 @@ export function Home () {
   return (
     <React.Fragment>
       <h2>{heroes.length} results</h2>
-      <p><button onClick={() => showModal(() => <div />)}>manage columns</button></p>
+      <p>
+        <button onClick={() => showModal()}>
+          manage columns
+        </button>
+      </p>
       <table>
         <Header
           columnMap={columnMap}
@@ -112,7 +139,7 @@ export function Home () {
               <tr key={hero.slug}>
                 {columns.map(key => {
                   return (
-                    <td key={`${hero.slug}-${key}`}>
+                    <td key={`${key}-${hero.slug}`}>
                       {columnMap[key].value(hero)}
                     </td>
                   )
