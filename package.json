@@ -21,7 +21,6 @@
     "lodash-move": "^1.1.1",
     "react": "latest",
     "react-dom": "latest",
-    "react-draggable": "^3.2.1",
     "react-modal": "^3.8.1",
     "react-router-dom": "^5.0.0",
     "react-scripts": "latest",

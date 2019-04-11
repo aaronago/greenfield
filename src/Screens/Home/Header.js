@@ -1,14 +1,24 @@
 import React from 'react'
-import Draggable from 'react-draggable'
 import {DotsVerticalRounded} from 'styled-icons/boxicons-regular/DotsVerticalRounded'
 import {SortDown} from 'styled-icons/fa-solid/SortDown'
 import {SortUp} from 'styled-icons/fa-solid/SortUp'
 import mapValues from 'lodash-es/mapValues'
+import {useGesture} from 'react-with-gesture'
 
 import {CanSort, DragSpan, SortClickable, TH} from './Visuals'
 
 const THead = React.memo((props) => {
   const {columnMap, columns, handleSort, setColumnPreferences, setWidth, sort} = props
+
+  const bind = useGesture((event) => {
+    const {args: [key], previous: [previousX], xy: [curX], down, delta: [lastX]} = event
+    const deltaX = curX - previousX
+    setWidth({key, deltaX})
+    if (!down) {
+      setColumnPreferences({resize: {key, lastX}})
+    }
+  })
+
   return (
     <thead>
       <tr>
@@ -16,7 +26,7 @@ const THead = React.memo((props) => {
           if (columnMap[key].fixed) {
             return <TH key={`${key}-th`}>{columnMap[key].label}</TH>
           }
-          
+
           return (
             <TH key={`${key}-th`}>
               <SortClickable onClick={() => handleSort(key)}>
@@ -25,17 +35,9 @@ const THead = React.memo((props) => {
                 {sort.key === key && sort.direction === 'desc' && <SortUp size={14} />}
                 {columnMap[key].label}
               </SortClickable>
-              <Draggable
-                axis="x"
-                onDrag={(e, {deltaX}) => setWidth({key, deltaX})}
-                onStop={(e, {lastX}) => setColumnPreferences({resize: {key, lastX}})}
-                position={{x: 0}}
-                zIndex={999}
-              >
-                <DragSpan>
-                  <DotsVerticalRounded size={16} />
-                </DragSpan>
-              </Draggable>
+              <DragSpan {...bind(key)}>
+                <DotsVerticalRounded size={16} />
+              </DragSpan>
             </TH>
           )
         })}
