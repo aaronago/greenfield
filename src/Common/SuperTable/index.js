@@ -1,5 +1,6 @@
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import useModal from 'Hooks/useModal'
 
@@ -51,18 +52,8 @@ function preferencesReducer (state, action) {
   return state
 }
 
-/**
- * WIP: SuperTable API
- * sort: {key, direction} required, direction must be enum 'asc' || 'desc'
- * preferences: {order, columns}
- * masterColumnArray: [] column keys
- * columnMap: {key: label, value, fixed}
- * data: []
- * handleSort: (key) => null
- * prefCallback: (pref, prev, init) => null // optional
- */
 function SuperTable (props) {
-  const {columnMap, handleSort, preferences, masterColumnArray, prefCallback, sort, data} = props
+  const {children, columnMap, data, handleSort, preferences, masterColumnArray, prefCallback, rowKeyGetter, sort} = props
 
   const [columnPreferences, setColumnPreferences] = React.useReducer(preferencesReducer, preferences)
   const prevColumnPreferences = React.useRef(null)
@@ -111,10 +102,37 @@ function SuperTable (props) {
           setColumnPreferences={setColumnPreferences}
           sort={sort}
         />
-        <Body {...{columnMap, columns, data}} />
+        <Body {...{columnMap, columns, data, rowKeyGetter}}>
+          {children}
+        </Body>
       </Table>
     </TableWrapper>
   )
+}
+
+SuperTable.propTypes = {
+  children: PropTypes.func,
+  columnMap: PropTypes.objectOf(PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    value: PropTypes.func.isRequired,
+    fixed: PropTypes.bool
+  })).isRequired,
+  data: PropTypes.array.isRequired,
+  handleSort:PropTypes.func.isRequired,
+  masterColumnArray: PropTypes.array.isRequired,
+  preferences: PropTypes.shape({
+    order: PropTypes.array.isRequired,
+    columns: PropTypes.objectOf(PropTypes.shape({
+      width: PropTypes.number.isRequired,
+      enabled: PropTypes.bool.isRequired
+    })).isRequired
+  }).isRequired,
+  prefCallback: PropTypes.func,
+  rowKeyGetter: PropTypes.func,
+  sort: PropTypes.shape({
+    key: PropTypes.string.isRequired,
+    direction: PropTypes.oneOf(['asc', 'desc']).isRequired
+  }).isRequired
 }
 
 export default SuperTable

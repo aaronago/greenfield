@@ -21,14 +21,13 @@ export const TableWrapper = styled('div')`
 `
 
 export const Table = styled('table')`
+  table-layout:fixed;
   border-collapse: collapse;
 `
 
 export const TBody = styled('tbody')`
   border-bottom: 1px solid #ddd;
 `
-
-export const TR = styled('tr')``
 
 export const TD = styled('td')`
   padding: 0.5rem;

@@ -138,6 +138,10 @@ function dataReducer (state, action) {
   return state
 }
 
+function rowKeyGetter (datum) {
+  return datum.slug
+}
+
 export function Home () {
   const [data, dispatch] = React.useReducer(dataReducer, initialData)
   const {heroes, preferences, sort} = data
@@ -177,7 +181,16 @@ export function Home () {
   return (
     <React.Fragment>
       <H2>{heroes.length} results </H2>
-      <SuperTable {...{columnMap, handleSort, preferences, masterColumnArray, prefCallback, sort, data: heroes}} />
+      <SuperTable {...{columnMap, handleSort, preferences, masterColumnArray, prefCallback, rowKeyGetter, sort, data: heroes}}>
+        {({datum}) => {
+          return (
+            <React.Fragment>
+              <h1>{datum.biography.fullName}</h1>
+              <p><img src={datum.images.sm} alt={datum.name} /></p>
+            </React.Fragment>
+          )
+        }}
+      </SuperTable>
     </React.Fragment>
   )
 }
