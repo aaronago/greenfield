@@ -5,7 +5,7 @@ import {SortUp} from 'styled-icons/fa-solid/SortUp'
 import mapValues from 'lodash-es/mapValues'
 import {useGesture} from 'react-with-gesture'
 
-import {CanSort, DragSpan, SortClickable, TH} from './Visuals'
+import {CanSort, ResizeHandle, SortClickable, TH} from './Visuals'
 
 const THead = React.memo((props) => {
   const {columnMap, columns, handleSort, setColumnPreferences, setWidth, sort} = props
@@ -35,9 +35,9 @@ const THead = React.memo((props) => {
                 {sort.key === key && sort.direction === 'desc' && <SortUp size={14} />}
                 {columnMap[key].label}
               </SortClickable>
-              <DragSpan {...bind(key)}>
+              <ResizeHandle {...bind(key)}>
                 <DotsVerticalRounded size={16} />
-              </DragSpan>
+              </ResizeHandle>
             </TH>
           )
         })}
@@ -46,13 +46,27 @@ const THead = React.memo((props) => {
   )
 })
 
-function reducer (state, {key, deltaX}) {
+function initReducer (columns) {
+  return mapValues(columns, c => c.width)
+}
+
+function reducer (state, action) {
+  if (action.init) {
+    return initReducer(action.init)
+  }
+
+  const {key, deltaX} = action
   return { ...state, [key]: state[key] + deltaX }
 }
 
 function Header (props) {
   const {columnMap, columns, columnPreferences, handleSort, setColumnPreferences, sort} = props
-  const [widths, setWidth] = React.useReducer(reducer, mapValues(columnPreferences.columns, (o) => o.width))
+  const prefColumnMap = columnPreferences.columns
+  const [widths, setWidth] = React.useReducer(reducer, prefColumnMap, initReducer)
+
+  React.useEffect(() => {
+    setWidth({init: prefColumnMap})
+  }, [prefColumnMap])
 
   return (
     <React.Fragment>

@@ -1,16 +1,23 @@
 
 import React from 'react'
+import styled from 'styled-components'
 import isEqual from 'lodash-es/isEqual'
 import orderBy from 'lodash-es/orderBy'
 import {MoneyBill} from 'styled-icons/fa-solid/MoneyBill'
 
-import useModal from 'Hooks/useModal'
 import {getAllHeroes} from 'api'
 
-import Header from './Header'
-import Modal from './Modal'
-import {H2, Table, TD, TR} from './Visuals'
+import SuperTable from 'Common/SuperTable'
 
+const H2 = styled('h2')`
+  width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+`
+
+// SuperTable Requirements
 const masterColumnArray = [
   'name',
   'gender',
@@ -69,55 +76,14 @@ const initialPreferences = {
   }
 }
 
-function preferencesReducer (state, action) {
-  if (action.resize) {
-    const {key, lastX} = action.resize
-    return {
-      ...state,
-      columns: {
-        ...state.columns,
-        [key]: {
-          ...state.columns[key],
-          width: state.columns[key].width + lastX
-        }
-      }
-    }
-  }
-
-  if (action.showHide) {
-    const {key, value} = action.showHide
-    return {
-      ...state,
-      columns: {
-        ...state.columns,
-        [key]: {
-          ...state.columns[key],
-          enabled: value
-        }
-      }
-    }
-  }
-
-  if (action.changeOrder) {
-    return {
-      ...state,
-      order: action.changeOrder
-    }
-  }
-
-  if (action.hydrate) {
-    return {...state, ...action.hydrate}
-  }
-
-  return state
-}
-
+// Home Data Requirements
 const initialData = {
   sort: {
     key: 'name',
     direction: 'asc'
   },
-  heroes: null
+  heroes: null,
+  preferences: null
 }
 
 function dataReducer (state, action) {
@@ -135,6 +101,7 @@ function dataReducer (state, action) {
     if (sortKey === sort.key) {
       return sort.direction === 'asc'
         ? {
+            ...state,
             sort: {
               key: sortKey,
               direction: 'desc'
@@ -142,6 +109,7 @@ function dataReducer (state, action) {
             heroes: orderBy(state.heroes, columnMap[sortKey].value, 'desc')
           }
         : {
+            ...state,
             sort: {
               key: sortKey,
               direction: 'asc'
@@ -150,6 +118,7 @@ function dataReducer (state, action) {
           }
     } else {
       return {
+        ...state,
         sort: {
           key: sortKey,
           direction: 'asc'
@@ -159,29 +128,35 @@ function dataReducer (state, action) {
     }
   }
 
+  if (action.setPreferences) {
+    return {
+      ...state,
+      preferences: action.setPreferences
+    }
+  }
+
   return state
 }
 
 export function Home () {
   const [data, dispatch] = React.useReducer(dataReducer, initialData)
-  const {heroes, sort} = data
+  const {heroes, preferences, sort} = data
 
-  const [columnPreferences, setColumnPreferences] = React.useReducer(preferencesReducer, initialPreferences)
-  const prevColumnPreferences = React.useRef(null)
+  const prefCallback = React.useCallback((pref, prev, init) => {
+    // Update our preferences on change.
+    if (prev && !isEqual(prev, pref)) {
+      localStorage.setItem('super-hero-preferences', JSON.stringify(pref))
+    }
+  }, [])
 
   React.useEffect(() => {
-    if (prevColumnPreferences.current && !isEqual(prevColumnPreferences, columnPreferences)) {
-      localStorage.setItem('super-hero-preferences', JSON.stringify(columnPreferences))
+    // Hydrate preferences with stored
+    if (localStorage.getItem('super-hero-preferences')) {
+      dispatch({setPreferences: JSON.parse(localStorage.getItem('super-hero-preferences'))})
+    } else {
+      dispatch({setPreferences: initialPreferences})
     }
 
-    if (!prevColumnPreferences.current && localStorage.getItem('super-hero-preferences')) {
-      setColumnPreferences({
-        hydrate: JSON.parse(localStorage.getItem('super-hero-preferences'))
-      })
-    }
-  }, [columnPreferences])
-
-  React.useEffect(() => {
     async function fetchData () {
       try {
         const { data } = await getAllHeroes()
@@ -195,65 +170,14 @@ export function Home () {
 
   const handleSort = React.useCallback((sortKey) => dispatch({sortKey}), [])
 
-  const columns = React.useMemo(() => {
-    return columnPreferences.order.map(i => masterColumnArray[i]).filter(k => columnPreferences.columns[k].enabled)
-  }, [columnPreferences])
-
-  const memoModal = React.useCallback(() => {
-    return (
-      <Modal
-        columnMap={columnMap}
-        columns={columns}
-        columnPreferences={columnPreferences}
-        masterColumnArray={masterColumnArray}
-        setColumnPreferences={setColumnPreferences}
-      />
-    )
-  }, [columnPreferences, columns])
-
-  const [showModal] = useModal(memoModal)
-
-  React.useEffect(() => {
-    prevColumnPreferences.current = columnPreferences
-  }, [columnPreferences])
-
-  if (!heroes) {
+  if (!heroes || !preferences) {
     return null
   }
 
   return (
     <React.Fragment>
-      <H2>{heroes.length} results <button onClick={showModal}>manage columns</button></H2>
-      <Table>
-        <Header
-          columnMap={columnMap}
-          columnPreferences={columnPreferences}
-          columns={columns}
-          handleSort={handleSort}
-          setColumnPreferences={setColumnPreferences}
-          sort={sort}
-        />
-        <tbody>
-          {heroes.map((hero, i) => {
-            return (
-              <TR key={hero.slug} contrast={i % 2 === 0}>
-                {columns.map(key => {
-                  return (
-                    <TD key={`${key}-${hero.slug}`}>
-                      {columnMap[key].value(hero)}
-                    </TD>
-                  )
-                })}
-              </TR>
-            )
-          })}
-        </tbody>
-      </Table>
+      <H2>{heroes.length} results </H2>
+      <SuperTable {...{columnMap, handleSort, preferences, masterColumnArray, prefCallback, sort, data: heroes}} />
     </React.Fragment>
   )
 }
-
-/**
- * WIP: SuperTable API
- * sort: {key, direction} required, direction must be enum 'asc' || 'desc'
- */

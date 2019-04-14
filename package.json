@@ -13,9 +13,7 @@
     "lint": "eslint \"src/**/*.{js,jsx}\""
   },
   "dependencies": {
-    "@reach/router": "latest",
     "axios": "latest",
-    "draggable": "^4.2.0",
     "history": "^4.9.0",
     "lodash-es": "^4.17.11",
     "lodash-move": "^1.1.1",
@@ -25,7 +23,6 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "latest",
     "react-spring": "^8.0.19",
-    "react-virtualized": "^9.21.0",
     "react-with-gesture": "^4.0.8",
     "serve": "latest",
     "styled-components": "latest",

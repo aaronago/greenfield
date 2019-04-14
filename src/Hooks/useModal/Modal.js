@@ -4,8 +4,18 @@ import ReactModal from 'react-modal'
 import styled from 'styled-components'
 import { Close as StyledIconClose } from 'styled-icons/material/Close'
 
-import { TextButton } from 'Atoms'
 import { themeValue } from 'theme'
+
+const TextButton = styled('button')`
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+`
 
 const CloseIcon = styled(StyledIconClose)`
   height: ${themeValue('baseIconHeight')}rem;

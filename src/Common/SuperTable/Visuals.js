@@ -1,23 +1,34 @@
-
-import styled, {css} from 'styled-components'
+import React from 'react'
+import styled from 'styled-components'
 import {animated} from 'react-spring'
 import {Sort} from 'styled-icons/fa-solid/Sort'
+import {Edit as EditIcon} from 'styled-icons/material/Edit'
 
-export const H2 = styled('h2')`
-  width: 1000px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 1.5rem;
+export const TextButton = styled('button')`
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+  text-align: inherit;
+`
+
+export const TableWrapper = styled('div')`
+  display: table;
 `
 
 export const Table = styled('table')`
   border-collapse: collapse;
 `
 
-export const TR = styled('tr')`
-  ${({contrast}) => contrast && css`background-color: #eee;`}
+export const TBody = styled('tbody')`
+  border-bottom: 1px solid #ddd;
 `
+
+export const TR = styled('tr')``
 
 export const TD = styled('td')`
   padding: 0.5rem;
@@ -31,7 +42,7 @@ export const TH = styled('th')`
   background-color: #ddd;
 `
 
-export const DragSpan = styled('span')`
+export const ResizeHandle = styled(TextButton)`
   cursor: col-resize;
   position: absolute;
   top: 0;
@@ -75,3 +86,27 @@ export const ReorderDraggable = styled(animated.div)`
 export const CanSort = styled(Sort)`
   color: #999;
 `
+
+const EditWrapper = styled('div')`
+  display: flex;
+  justify-content: flex-end;
+
+  ${TextButton} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: #ddd;
+  }
+`
+
+export function Edit ({handleClick, width}) {
+  return (
+    <EditWrapper width={width}>
+      <TextButton onClick={handleClick}>
+        <EditIcon size={16} />
+      </TextButton>
+    </EditWrapper>
+  )
+}

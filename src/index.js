@@ -1,12 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 
-import { Application } from 'Atoms'
 import { Routes } from 'Routes'
 import { ModalProvider } from 'Hooks/useModal'
 
-import { theme, GlobalStyle } from 'theme'
+import { theme, themeValue, GlobalStyle } from 'theme'
+
+export const Application = styled('main')`
+  padding: ${themeValue('space.large')};
+`
 
 function App() {
   return (
