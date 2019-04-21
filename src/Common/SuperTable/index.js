@@ -82,7 +82,7 @@ function SuperTable (props) {
   // Trigger preference change callback in the parent.
   React.useEffect(() => {
     if (prefCallback && typeof prefCallback === 'function') {
-      prefCallback(columnPreferences, prevColumnPreferences.current, (payload) => setColumnPreferences({init: payload}))
+      prefCallback(columnPreferences, prevColumnPreferences.current)
     }
   }, [columnPreferences, prefCallback])
 

@@ -146,7 +146,7 @@ export function Home () {
   const [data, dispatch] = React.useReducer(dataReducer, initialData)
   const {heroes, preferences, sort} = data
 
-  const prefCallback = React.useCallback((pref, prev, init) => {
+  const prefCallback = React.useCallback((pref, prev) => {
     // Update our preferences on change.
     if (prev && !isEqual(prev, pref)) {
       localStorage.setItem('super-hero-preferences', JSON.stringify(pref))
