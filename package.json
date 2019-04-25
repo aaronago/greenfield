@@ -25,6 +25,7 @@
     "react-spring": "^8.0.19",
     "react-with-gesture": "^4.0.8",
     "serve": "latest",
+    "shortid": "^2.2.14",
     "styled-components": "latest",
     "styled-icons": "^7.9.0"
   },
